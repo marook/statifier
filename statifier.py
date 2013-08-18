@@ -2,13 +2,23 @@ import subprocess
 import sys
 import re
 import os.path
+import shutil
 
 def main():
     statify(sys.argv[1], sys.argv[2])
 
 def statify(binaryPath, outputPath):
+    copiedLibrariesNumber = 0
+
     for library in detectUsedLibraries(binaryPath):
-        print 'lib: %s' % (library,)
+        try:
+            shutil.copyfile(library.path, os.path.join(outputPath, library.name))
+
+            copiedLibrariesNumber += 1
+        except Exception as e:
+            print 'Failed to copy library %s: %s' % (library.name, e)
+
+    print 'Copied %s libraries' % (copiedLibrariesNumber,)
 
 class Library(object):
 
